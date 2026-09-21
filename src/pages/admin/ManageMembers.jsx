@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import api from "../../services/api";
+import { resolveImage } from "../../utils/resolveImage";
 import AdminPageHeader from "../../components/admin/PageHeader";
 import Modal from "../../components/ui/Modal";
 import Loader from "../../components/ui/Loader";
 import EmptyState from "../../components/ui/EmptyState";
-import { resolveStaticBase } from "../../services/api";
-
-const STATIC_URL = resolveStaticBase();
 
 const empty = {
   first_name: "",
@@ -36,15 +34,15 @@ export default function ManageMembers() {
 
   const loadYears = () =>
     api.get("/academic-years").then((r) => {
-      setYears(r.data);
-      if (r.data.length && !filterYear) setFilterYear(String(r.data[0].id));
+      setYears(r.data || []);
+      if (r.data?.length && !filterYear) setFilterYear(String(r.data[0].id));
     });
 
   const loadMembers = (yearId) => {
     setLoading(true);
     api
       .get("/members", { params: yearId ? { yearId } : {} })
-      .then((r) => setMembers(r.data))
+      .then((r) => setMembers(r.data || []))
       .catch(() => setMembers([]))
       .finally(() => setLoading(false));
   };
@@ -79,7 +77,7 @@ export default function ManageMembers() {
       display_order: m.display_order ?? 0,
     });
     setPhoto(null);
-    setPreview(m.photo_url ? `${STATIC_URL}${m.photo_url}` : null);
+    setPreview(resolveImage(m.photo_url));
     setError("");
     setShowModal(true);
   };
@@ -172,11 +170,7 @@ export default function ManageMembers() {
                   <tr key={m.id}>
                     <td>
                       <img
-                        src={
-                          m.photo_url
-                            ? `${STATIC_URL}${m.photo_url}`
-                            : "/default-avatar.png"
-                        }
+                        src={resolveImage(m.photo_url) || "/default-avatar.png"}
                         alt=""
                         className="adm-thumb"
                       />

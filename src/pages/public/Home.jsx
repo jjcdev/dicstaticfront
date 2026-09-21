@@ -1,12 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
   FaArrowRight,
-  FaChevronDown,
+  FaFacebook,
+  FaGithub,
+  FaLinkedin,
   FaBrain,
   FaShieldAlt,
   FaMicrochip,
-  FaLaptopCode,
+  FaCode,
   FaFlag,
   FaRobot,
   FaBolt,
@@ -14,88 +16,17 @@ import {
   FaRocket,
   FaTrophy,
   FaCalendarAlt,
+  FaChevronDown,
 } from "react-icons/fa";
+
 import Reveal from "../../components/ui/Reveal";
+import Slider from "../../components/ui/Slider";
+import ParticleField from "../../components/ui/ParticleField";
 import EventCard from "../../components/ui/EventCard";
 import { getEvents } from "../../services/eventService";
+import { ensureArray } from "../../utils/ensureArray";
 
-/* ---------- Machine a ecrire ---------- */
-
-function Typewriter({ words, speed = 75, pause = 1600 }) {
-  const [index, setIndex] = useState(0);
-  const [text, setText] = useState("");
-  const [deleting, setDeleting] = useState(false);
-
-  useEffect(() => {
-    const current = words[index % words.length];
-    let timer;
-
-    if (!deleting && text === current) {
-      timer = setTimeout(() => setDeleting(true), pause);
-    } else if (deleting && text === "") {
-      setDeleting(false);
-      setIndex((i) => i + 1);
-    } else {
-      timer = setTimeout(
-        () => {
-          setText((prev) =>
-            deleting
-              ? prev.slice(0, -1)
-              : current.slice(0, prev.length + 1)
-          );
-        },
-        deleting ? speed / 2 : speed
-      );
-    }
-    return () => clearTimeout(timer);
-  }, [text, deleting, index, words, speed, pause]);
-
-  return (
-    <span className="dic-typewriter">
-      <span className="dic-typewriter-text">{text}</span>
-      <span className="dic-caret"></span>
-    </span>
-  );
-}
-
-/* ---------- Compteur anime ---------- */
-
-function Counter({ to, suffix = "" }) {
-  const ref = useRef(null);
-  const [value, setValue] = useState(0);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        observer.unobserve(el);
-        const start = performance.now();
-        const duration = 1400;
-        const tick = (now) => {
-          const t = Math.min((now - start) / duration, 1);
-          const eased = 1 - Math.pow(1 - t, 3);
-          setValue(Math.round(to * eased));
-          if (t < 1) requestAnimationFrame(tick);
-        };
-        requestAnimationFrame(tick);
-      },
-      { threshold: 0.4 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [to]);
-
-  return (
-    <span ref={ref}>
-      {value}
-      {suffix}
-    </span>
-  );
-}
-
-/* ---------- Donnees statiques ---------- */
+/* ============ Donnees statiques ============ */
 
 const MARQUEE = [
   "Intelligence Artificielle",
@@ -110,44 +41,49 @@ const MARQUEE = [
 
 const POLES = [
   {
-    number: "01",
     Icon: FaBrain,
+    badge: "Pole 01",
     title: "Intelligence Artificielle",
-    tagline: "Modeliser, entrainer, deployer.",
-    description:
-      "Nous explorons les modeles d'apprentissage automatique, du prototype au deploiement. Ateliers pratiques, projets appliques et veille sur les avancees du domaine.",
-    topics: ["Machine Learning", "Deep Learning", "NLP", "Vision"],
+    text: "Modelisation, entrainement et deploiement de modeles d'apprentissage. Ateliers pratiques et projets appliques.",
+    tags: ["ML", "Deep Learning", "NLP", "Vision"],
+    accent: false,
   },
   {
-    number: "02",
     Icon: FaShieldAlt,
+    badge: "Pole 02",
     title: "Cybersecurite",
-    tagline: "Offensive et defensive.",
-    description:
-      "Analyse de vulnerabilites, forensique, cryptographie et participation a des competitions Capture The Flag. On apprend en cassant, puis en protegeant.",
-    topics: ["Pentest", "Forensique", "Crypto", "CTF"],
+    text: "Analyse de vulnerabilites, forensique et participation a des competitions Capture The Flag.",
+    tags: ["Pentest", "Forensique", "Crypto", "CTF"],
+    accent: true,
   },
   {
-    number: "03",
     Icon: FaMicrochip,
+    badge: "Pole 03",
     title: "Robotique et Systemes embarques",
-    tagline: "Du microcontroleur au robot autonome.",
-    description:
-      "Conception de systemes physiques : capteurs, actionneurs, protocoles de communication. Des projets concrets qui finissent en demonstration.",
-    topics: ["Arduino", "Raspberry Pi", "ROS", "IoT"],
+    text: "Conception de systemes physiques : capteurs, actionneurs, protocoles de communication.",
+    tags: ["Arduino", "Raspberry Pi", "ROS", "IoT"],
+    accent: false,
+  },
+  {
+    Icon: FaCode,
+    badge: "Pole 04",
+    title: "Developpement logiciel",
+    text: "Applications web, outils internes et contributions open source. Du prototype a la mise en production.",
+    tags: ["Web", "Mobile", "API", "DevOps"],
+    accent: true,
   },
 ];
 
 const CHALLENGES = [
   {
-    Icon: FaLaptopCode,
+    Icon: FaFlag,
     title: "Hackathons",
     text: "48 heures pour concevoir une solution a un probleme reel.",
   },
   {
-    Icon: FaFlag,
+    Icon: FaShieldAlt,
     title: "CTF",
-    text: "Competitions de securite par equipes, du niveau debutant a avance.",
+    text: "Competitions de securite par equipes, du debutant a l'avance.",
   },
   {
     Icon: FaRobot,
@@ -157,228 +93,370 @@ const CHALLENGES = [
   {
     Icon: FaBolt,
     title: "Code sprints",
-    text: "Sessions intensives sur un theme : IA, web, embarqué.",
+    text: "Sessions intensives sur un theme : IA, web, embarque.",
   },
 ];
 
-/* ---------- Page ---------- */
+const STATS = [
+  { Icon: FaUsers, to: 120, suffix: "+", label: "Membres" },
+  { Icon: FaRocket, to: 30, suffix: "+", label: "Projets" },
+  { Icon: FaTrophy, to: 12, suffix: "", label: "Challenges" },
+  { Icon: FaCalendarAlt, to: 25, suffix: "+", label: "Evenements" },
+];
+
+/* ============ Hook : taille d'ecran ============ */
+
+function useMediaQuery(query) {
+  const [matches, setMatches] = useState(() =>
+    typeof window !== "undefined" ? window.matchMedia(query).matches : false
+  );
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const onChange = (e) => setMatches(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, [query]);
+  return matches;
+}
+
+/* ============ Composant Counter ============ */
+
+function Counter({ to, suffix = "" }) {
+  const ref = useRef(null);
+  const [value, setValue] = useState(0);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          obs.unobserve(el);
+        }
+      },
+      { threshold: 0.4 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!visible) return;
+    const start = performance.now();
+    const duration = 1600;
+    let raf = null;
+    const tick = (now) => {
+      const t = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setValue(Math.round(to * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => raf && cancelAnimationFrame(raf);
+  }, [visible, to]);
+
+  return (
+    <span ref={ref}>
+      {value}
+      {suffix}
+    </span>
+  );
+}
+
+/* ============ Composant : titre qui apparait mot par mot ============ */
+
+function AnimatedTitle({ children, delay = 0 }) {
+  return (
+    <span className="anim-title" style={{ animationDelay: `${delay}ms` }}>
+      {children}
+    </span>
+  );
+}
+
+/* ============ Page ============ */
 
 export default function Home() {
   const [events, setEvents] = useState([]);
+  const isDesktop = useMediaQuery("(min-width: 992px)");
 
   useEffect(() => {
-    getEvents({ upcoming: true, limit: 3 })
-      .then(setEvents)
-      .catch(() => {});
+    getEvents({ limit: 8 })
+      .then((data) => setEvents(ensureArray(data)))
+      .catch(() => setEvents([]));
   }, []);
 
   return (
-    <>
-      {/* ============ HERO ============ */}
-      <section className="dic-hero-v2">
-        <div className="dic-hero-grid" aria-hidden="true" />
+    <div className="home">
+      {/* Blobs decoratifs flottants */}
+      <div className="home-blob home-blob-top" aria-hidden="true" />
+      <div className="home-blob home-blob-bottom" aria-hidden="true" />
 
-        <div className="container dic-hero-content">
-          <Reveal>
-            <span className="dic-hero-tag">
-              <span className="dic-hero-tag-dot" />
-              Club actif - 2025 / 2026
-            </span>
-          </Reveal>
+      <div className="home-content">
+        {/* ============== HERO FULLSCREEN ============== */}
+        <section className="hero-full">
+          <ParticleField
+            variant={isDesktop ? "dense" : "default"}
+            interactive={isDesktop}
+          />
+          <div className="hero-dotgrid" aria-hidden="true" />
+          <div className="hero-glow" aria-hidden="true" />
 
-          <Reveal delay={80}>
-            <h1 className="dic-hero-v2-title mb-5 text-shadow">
-              Digital Innovation Club
-            </h1>
-          </Reveal>
-          <Reveal delay={160}>
-            <h4 className="text-light text-shadow">Learn, Build, Innnovate</h4>
-          </Reveal>
-          <Reveal delay={240}>
-            <div className="dic-hero-v2-actions mt-5 ">
-              <Link to="/a-propos" className="btn dic-btn-primary btn-lg">
-                Decouvrir le club <FaArrowRight className="ms-2" />
-              </Link>
-              <Link to="/evenements" className="btn dic-btn-ghost btn-lg">
-                Voir les evenements
-              </Link>
+          <div className="container-dic hero-full-inner">
+            <div className="hero-top">
+              <span className="hero-brand">
+                <span className="hero-brand-dot" />
+                DIGITAL INNOVATION CLUB
+              </span>
+              <ul className="hero-links">
+                <li><Link to="/a-propos">Notre histoire</Link></li>
+                <li><Link to="/bureau">Bureau</Link></li>
+                <li><Link to="/evenements">Agenda</Link></li>
+              </ul>
             </div>
-          </Reveal>
-        </div>
 
-        <a href="#poles" className="dic-hero-scroll" aria-label="Faire defiler">
-          <FaChevronDown />
-        </a>
-      </section>
-
-      {/* ============ MARQUEE ============ */}
-      <div className="dic-marquee" aria-hidden="true">
-        <div className="dic-marquee-track">
-          {[...MARQUEE, ...MARQUEE].map((word, i) => (
-            <span className="dic-marquee-item" key={i}>
-              {word}
-              <span className="dic-marquee-sep">///</span>
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* ============ POLES ============ */}
-      <section id="poles" className="dic-poles">
-        <div className="container">
-          <Reveal>
-            <div className="dic-section-eyebrow">Nos poles</div>
-            <h2 className="dic-section-h2">
-              Trois domaines, une seule communaute.
-            </h2>
-            <p className="dic-section-p">
-              Chaque pole mene ses propres projets, ateliers et challenges.
-              Tu peux rejoindre celui qui te parle, ou tous les explorer.
-            </p>
-          </Reveal>
-
-          <div className="dic-poles-list">
-            {POLES.map((pole, i) => {
-              const reverse = i % 2 === 1;
-              return (
-                <Reveal key={pole.number} delay={i * 100}>
-                  <article
-                    className={`dic-pole ${reverse ? "dic-pole--reverse" : ""}`}
-                  >
-                    <div className="dic-pole-visual">
-                      <div className="dic-pole-number">{pole.number}</div>
-                      <div className="dic-pole-icon">
-                        <pole.Icon />
-                      </div>
-                    </div>
-
-                    <div className="dic-pole-body">
-                      <h3 className="dic-pole-title">{pole.title}</h3>
-                      <p className="dic-pole-tagline">{pole.tagline}</p>
-                      <p className="dic-pole-desc">{pole.description}</p>
-                      <ul className="dic-pole-topics">
-                        {pole.topics.map((t) => (
-                          <li key={t}>{t}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </article>
-                </Reveal>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ============ CHALLENGES ============ */}
-      <section className="dic-challenges">
-        <div className="container">
-          <Reveal>
-            <div className="dic-section-eyebrow">Challenges</div>
-            <h2 className="dic-section-h2">
-              On organise, on participe, on gagne.
-            </h2>
-            <p className="dic-section-p">
-              Tout au long de l'annee, le club met en place des competitions
-              internes et represente l'ecole a l'exterieur.
-            </p>
-          </Reveal>
-
-          <div className="row g-3 mt-2">
-            {CHALLENGES.map((c, i) => (
-              <div className="col-12 col-md-6 col-lg-3" key={c.title}>
-                <Reveal delay={i * 80}>
-                  <div className="dic-challenge">
-                    <div className="dic-challenge-icon">
-                      <c.Icon />
-                    </div>
-                    <h4 className="dic-challenge-title">{c.title}</h4>
-                    <p className="dic-challenge-text">{c.text}</p>
-                  </div>
-                </Reveal>
+            <div className="hero-main">
+              <div className="hero-copy">
+                <h1 className="hero-title">
+                  <AnimatedTitle delay={0}>Nous construisons</AnimatedTitle>
+                  <br />
+                  <AnimatedTitle delay={180}>
+                    <span className="accent">le futur numerique.</span>
+                  </AnimatedTitle>
+                </h1>
+                <p className="hero-sub">
+                  Digital Innovation Club rassemble les etudiants
+                  passionnes autour de trois poles : IA, cybersecurité et
+                  robotique. Challenges,
+                  ateliers, projets reels.
+                </p>
+                <div className="hero-actions">
+                  <Link to="/a-propos" className="dic-btn dic-btn-primary">
+                    Rejoindre le club <FaArrowRight size={12} />
+                  </Link>
+                  <Link to="/evenements" className="dic-btn dic-btn-ghost">
+                    Voir les evenements
+                  </Link>
+                </div>
               </div>
-            ))}
+
+              <aside className="hero-social" aria-label="Reseaux sociaux">
+                <a href="#" aria-label="LinkedIn"><FaLinkedin /></a>
+                <a href="#" aria-label="Facebook"><FaFacebook /></a>
+                <a href="#" aria-label="GitHub"><FaGithub /></a>
+              </aside>
+            </div>
+
+            <div className="hero-dots">
+              <span className="is-active" />
+              <span />
+              <span />
+              <span />
+            </div>
+          </div>
+
+          <a
+            href="#poles"
+            className="hero-scroll"
+            aria-label="Faire defiler"
+          >
+            <FaChevronDown />
+          </a>
+        </section>
+
+        {/* ============== MARQUEE AVEC FOND ANIME ============== */}
+        <div className="dic-marquee-wrap">
+          <ParticleField variant="ambient" interactive={false} />
+          <div className="dic-marquee" aria-hidden="true">
+            <div className="dic-marquee-track">
+              {[...MARQUEE, ...MARQUEE].map((word, i) => (
+                <span className="dic-marquee-item" key={i}>
+                  {word}
+                  <span className="dic-marquee-sep">/</span>
+                </span>
+              ))}
+            </div>
           </div>
         </div>
-      </section>
 
-      {/* ============ STATS ============ */}
-      {/* <section className="dic-stats-band">
-        <div className="container">
-          <div className="row g-4">
-            {[
-              { Icon: FaUsers, to: 120, suffix: "+", label: "Membres" },
-              { Icon: FaRocket, to: 30, suffix: "+", label: "Projets" },
-              { Icon: FaTrophy, to: 12, suffix: "", label: "Challenges" },
-              { Icon: FaCalendarAlt, to: 25, suffix: "+", label: "Evenements" },
-            ].map((s, i) => (
-              <div className="col-6 col-lg-3" key={s.label}>
-                <Reveal delay={i * 80}>
-                  <div className="dic-stat-v2">
-                    <s.Icon className="dic-stat-v2-icon" />
-                    <div className="dic-stat-v2-value">
-                      <Counter to={s.to} suffix={s.suffix} />
-                    </div>
-                    <div className="dic-stat-v2-label">{s.label}</div>
-                  </div>
-                </Reveal>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section> */}
-
-      {/* ============ EVENEMENTS ============ */}
-      {events.length > 0 && (
-        <section className="dic-home-events">
-          <div className="container">
+        {/* ============== POLES ============== */}
+        <section id="poles" className="dic-section">
+          <div className="container-dic">
             <Reveal>
               <div className="dic-section-head">
                 <div>
-                  <div className="dic-section-eyebrow">A venir</div>
-                  <h2 className="dic-section-h2 mb-0">
-                    Prochains evenements
+                  <span className="dic-eyebrow">Nos poles</span>
+                  <h2 className="dic-section-title">
+                    Quatre terrains d'exploration.
                   </h2>
+                  <p className="dic-section-sub">
+                    Chaque pole mene ses propres projets, ateliers et
+                    challenges. Rejoins celui qui te parle, ou explore les
+                    quatre.
+                  </p>
                 </div>
-                <Link to="/evenements" className="dic-section-link">
-                  Voir tout <FaArrowRight />
+                <Link to="/a-propos" className="dic-section-link">
+                  En savoir plus <FaArrowRight size={10} />
                 </Link>
               </div>
             </Reveal>
 
-            <div className="row g-3">
-              {events.map((e, i) => (
-                <div className="col-12 col-sm-6 col-lg-4" key={e.id}>
-                  <Reveal delay={i * 80}>
-                    <EventCard event={e} />
-                  </Reveal>
+            <Reveal>
+              <Slider ariaLabel="Poles du club">
+                {POLES.map((p, i) => (
+                  <article
+                    className="dic-slide dic-slide-anim"
+                    data-slide
+                    key={p.title}
+                    style={{ animationDelay: `${i * 80}ms` }}
+                  >
+                    <div className="dic-slide-media">
+                      <div className="dic-slide-glow" aria-hidden="true" />
+                      <p.Icon className="dic-slide-icon" aria-hidden="true" />
+                    </div>
+                    <div className="dic-slide-body">
+                      <span
+                        className={`dic-slide-badge ${p.accent ? "is-accent" : ""}`}
+                      >
+                        {p.badge}
+                      </span>
+                      <h3 className="dic-slide-title">{p.title}</h3>
+                      <p className="dic-slide-text">{p.text}</p>
+                      <div className="dic-slide-tags">
+                        {p.tags.map((t) => <span key={t}>{t}</span>)}
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </Slider>
+            </Reveal>
+          </div>
+        </section>
+
+        {/* ============== CHALLENGES ============== */}
+        <section className="dic-section">
+          <div className="container-dic">
+            <Reveal>
+              <div className="dic-section-head">
+                <div>
+                  <span className="dic-eyebrow">Challenges</span>
+                  <h2 className="dic-section-title">
+                    On organise, on participe, on gagne.
+                  </h2>
+                  <p className="dic-section-sub">
+                    Toute l'annee, le club met en place des competitions
+                    internes et represente l'ecole a l'exterieur.
+                  </p>
                 </div>
+              </div>
+            </Reveal>
+
+            <div className="dic-challenges-grid">
+              {CHALLENGES.map((c, i) => (
+                <Reveal key={c.title} delay={i * 80}>
+                  <div className="dic-challenge dic-hover-lift">
+                    <div className="dic-challenge-icon">
+                      <c.Icon aria-hidden="true" />
+                    </div>
+                    <h3 className="dic-challenge-title">{c.title}</h3>
+                    <p className="dic-challenge-text">{c.text}</p>
+                  </div>
+                </Reveal>
               ))}
             </div>
           </div>
         </section>
-      )}
 
-      {/* ============ CTA FINAL ============ */}
-      <section className="dic-cta">
-        <div className="container">
-          <Reveal>
-            <div className="dic-cta-inner">
-              <div>
-                <h2 className="dic-cta-title">
-                  Pret a construire avec nous ?
-                </h2>
-                <p className="dic-cta-text">
-                  Rejoins le club, choisis ton pole, participe aux challenges.
-                </p>
+        {/* ============== STATS AVEC FOND ANIME ============== */}
+        <section className="dic-section dic-section-particles">
+          <ParticleField variant="sparse" interactive={false} />
+          <div className="container-dic" style={{ position: "relative", zIndex: 1 }}>
+            <Reveal>
+              <div className="dic-section-head">
+                <div>
+                  <span className="dic-eyebrow">En chiffres</span>
+                  <h2 className="dic-section-title">
+                    Ce que le club represente aujourd'hui.
+                  </h2>
+                </div>
               </div>
-              <Link to="/contact" className="btn dic-btn-primary btn-lg">
-                Rejoindre le club <FaArrowRight className="ms-2" />
-              </Link>
+            </Reveal>
+
+            <div className="dic-stats">
+              {STATS.map((s, i) => (
+                <Reveal key={s.label} delay={i * 80}>
+                  <div className="dic-stat dic-hover-lift">
+                    <div className="dic-stat-icon-wrap">
+                      <s.Icon aria-hidden="true" />
+                    </div>
+                    <div className="dic-stat-value">
+                      <Counter to={s.to} suffix={s.suffix} />
+                    </div>
+                    <div className="dic-stat-label">{s.label}</div>
+                  </div>
+                </Reveal>
+              ))}
             </div>
-          </Reveal>
-        </div>
-      </section>
-    </>
+          </div>
+        </section>
+
+        {/* ============== EVENTS SLIDER ============== */}
+        {Array.isArray(events) && events.length > 0 && (
+          <section className="dic-section">
+            <div className="container-dic">
+              <Reveal>
+                <div className="dic-section-head">
+                  <div>
+                    <span className="dic-eyebrow">Agenda</span>
+                    <h2 className="dic-section-title">
+                      Ce qui arrive bientot.
+                    </h2>
+                  </div>
+                  <Link to="/evenements" className="dic-section-link">
+                    Tout voir <FaArrowRight size={10} />
+                  </Link>
+                </div>
+              </Reveal>
+
+              <Reveal>
+                <Slider ariaLabel="Evenements a venir">
+                  {events.map((e) => (
+                    <div className="dic-slide" data-slide key={e.id}>
+                      <EventCard event={e} />
+                    </div>
+                  ))}
+                </Slider>
+              </Reveal>
+            </div>
+          </section>
+        )}
+
+        {/* ============== CTA FINAL AVEC FOND ANIME ============== */}
+        <section className="dic-section">
+          <div className="container-dic">
+            <Reveal>
+              <div className="dic-cta">
+                <ParticleField variant="sparse" interactive={false} />
+                <div className="dic-cta-content">
+                  <div>
+                    <h2 className="dic-cta-title">
+                      Pret a construire avec nous ?
+                    </h2>
+                    <p className="dic-cta-sub">
+                      Rejoins le club, choisis ton pole, participe aux
+                      challenges et fais partie de l'aventure.
+                    </p>
+                  </div>
+                  <Link to="/contact" className="dic-btn dic-btn-primary">
+                    Rejoindre le club <FaArrowRight size={12} />
+                  </Link>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+      </div>
+    </div>
   );
 }

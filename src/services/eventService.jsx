@@ -1,6 +1,12 @@
-
-// eventService.js
 import api from "./api";
-export const getEvents    = async (params = {}) => (await api.get("/events", { params })).data;
-export const getEventById = async (id) => (await api.get(`/events/${id}`)).data;
+import { ensureArray } from "../utils/ensureArray";
 
+export const getEvents = async (params = {}) => {
+  const response = await api.get("/events", { params });
+  return ensureArray(response.data);
+};
+
+export const getEventById = async (id) => {
+  const response = await api.get(`/events/${id}`);
+  return response.data || null;
+};

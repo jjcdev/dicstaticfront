@@ -30,20 +30,18 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="dic-footer bg-dark text-light">
-      <div className="container">
-        <div className="row g-4 align-items-start">
-          <div className="col-12 col-lg-5">
-            <Link to="/" className="dic-footer-brand-f">
-              <img src="/logo-dic.png" alt="DIC" />
-              <span> <span className="text-primary h3">D</span>igital
-                      <br />
-                      <span className="text-primary h3">I</span>nnovation
-                      <br />
-                      <span className="text-primary h3">C</span>lub</span>
+    <footer className="dic-footer">
+      <div className="container-dic">
+        <div className="dic-footer-grid">
+          <div>
+            <Link to="/" className="dic-footer-brand">
+              <img src="/logo-dic.png" alt="" />
+              <span>Digital Innovation Club</span>
             </Link>
             <p className="dic-footer-text">
-              Learn, Build, Innovate
+              Un club ou l'on construit, apprend et partage autour de
+              l'intelligence artificielle, de la cybersecurite et des
+              systemes embarques.
             </p>
             <div className="dic-footer-socials">
               <a href="#" aria-label="Facebook"><FaFacebook /></a>
@@ -53,7 +51,7 @@ export default function Footer() {
           </div>
 
           {columns.map((col) => (
-            <div className="col-6 col-lg-2" key={col.title}>
+            <div key={col.title}>
               <h6 className="dic-footer-title">{col.title}</h6>
               <ul className="dic-footer-list">
                 {col.items.map((it) => (
@@ -65,7 +63,7 @@ export default function Footer() {
             </div>
           ))}
 
-          <div className="col-12 col-lg-3">
+          <div>
             <h6 className="dic-footer-title">Contact</h6>
             <ul className="dic-footer-list">
               <li className="d-flex align-items-center gap-2">
@@ -79,8 +77,7 @@ export default function Footer() {
         </div>
 
         <div className="dic-footer-bottom">
-          <span>{year} Digital Innovation Club</span>
-          <span className="dic-footer-bottom-sep">///</span>
+          <span>{year} <span className="accent">///</span> Digital Innovation Club</span>
           <span>Tous droits reserves</span>
         </div>
       </div>

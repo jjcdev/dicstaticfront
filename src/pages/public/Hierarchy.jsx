@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { getAcademicYears, getCurrentYear } from "../../services/yearService";
 import { getMembers } from "../../services/memberService";
+import PageHeader from "../../components/ui/PageHeader";
 import YearSelector from "../../components/ui/YearSelector";
 import MemberCard from "../../components/ui/MemberCard";
-import PageHeader from "../../components/ui/PageHeader";
+import Reveal from "../../components/ui/Reveal";
 import Loader from "../../components/ui/Loader";
 import EmptyState from "../../components/ui/EmptyState";
+import { ensureArray } from "../../utils/ensureArray";
 
 export default function Hierarchy() {
   const [years, setYears] = useState([]);
@@ -16,47 +18,57 @@ export default function Hierarchy() {
   useEffect(() => {
     Promise.all([getAcademicYears(), getCurrentYear()])
       .then(([allYears, current]) => {
-        setYears(allYears);
-        setSelectedYear(current?.id ?? allYears[0]?.id ?? null);
+        const list = ensureArray(allYears);
+        setYears(list);
+        setSelectedYear(current?.id ?? list[0]?.id ?? null);
       })
-      .catch(() => {});
+      .catch(() => {
+        setYears([]);
+      });
   }, []);
 
   useEffect(() => {
     if (!selectedYear) return;
     setLoading(true);
     getMembers(selectedYear)
-      .then(setMembers)
+      .then((data) => setMembers(ensureArray(data)))
       .catch(() => setMembers([]))
       .finally(() => setLoading(false));
   }, [selectedYear]);
 
   return (
-    <div className="container py-4 py-md-5">
-      <PageHeader
-        title="Bureau du club"
-        subtitle="Composition de l'administration par annee academique."
-      />
+    <div className="dic-page">
+      <div className="container-dic">
+        <Reveal>
+          <PageHeader
+            eyebrow="Bureau"
+            title="Les visages du club."
+            subtitle="Composition de l'administration par annee academique."
+          />
+        </Reveal>
 
-      <YearSelector
-        years={years}
-        selected={selectedYear}
-        onChange={setSelectedYear}
-      />
+        <Reveal>
+          <YearSelector
+            years={years}
+            selected={selectedYear}
+            onChange={setSelectedYear}
+          />
+        </Reveal>
 
-      {loading ? (
-        <Loader />
-      ) : members.length === 0 ? (
-        <EmptyState message="Aucun membre enregistre pour cette annee." />
-      ) : (
-        <div className="row g-3 g-md-4">
-          {members.map((m) => (
-            <div className="col-6 col-md-4 col-lg-3" key={m.id}>
-              <MemberCard member={m} />
-            </div>
-          ))}
-        </div>
-      )}
+        {loading ? (
+          <Loader />
+        ) : members.length === 0 ? (
+          <EmptyState message="Aucun membre enregistre pour cette annee." />
+        ) : (
+          <div className="dic-members-grid">
+            {members.map((m, i) => (
+              <Reveal key={m.id} delay={i * 50}>
+                <MemberCard member={m} />
+              </Reveal>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

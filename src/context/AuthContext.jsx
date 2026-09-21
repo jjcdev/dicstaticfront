@@ -9,11 +9,17 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const token = localStorage.getItem("dic_token");
-    if (!token) return setLoading(false);
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     authService
       .getMe()
       .then((data) => setAdmin(data.admin))
-      .catch(() => localStorage.removeItem("dic_token"))
+      .catch(() => {
+        localStorage.removeItem("dic_token");
+        setAdmin(null);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -21,6 +27,7 @@ export function AuthProvider({ children }) {
     const data = await authService.login(email, password);
     localStorage.setItem("dic_token", data.token);
     setAdmin(data.admin);
+    return data;
   };
 
   const signOut = () => {

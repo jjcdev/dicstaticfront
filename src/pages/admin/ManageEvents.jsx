@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
-import api, { resolveStaticBase } from "../../services/api";
+import api from "../../services/api";
+import { resolveImage } from "../../utils/resolveImage";
 import AdminPageHeader from "../../components/admin/PageHeader";
 import Modal from "../../components/ui/Modal";
 import Loader from "../../components/ui/Loader";
 import EmptyState from "../../components/ui/EmptyState";
-
-const STATIC_URL = resolveStaticBase();
 
 const empty = {
   title: "",
@@ -33,7 +32,7 @@ export default function ManageEvents() {
   const loadYears = () =>
     api
       .get("/academic-years")
-      .then((r) => setYears(r.data))
+      .then((r) => setYears(r.data || []))
       .catch(() => {});
 
   const loadEvents = () => {
@@ -42,7 +41,7 @@ export default function ManageEvents() {
     if (filterYear) params.yearId = filterYear;
     api
       .get("/events", { params })
-      .then((r) => setEvents(r.data))
+      .then((r) => setEvents(r.data || []))
       .catch(() => setEvents([]))
       .finally(() => setLoading(false));
   };
@@ -74,7 +73,7 @@ export default function ManageEvents() {
       academic_year_id: ev.academic_year_id ?? "",
     });
     setCover(null);
-    setPreview(ev.cover_image ? `${STATIC_URL}${ev.cover_image}` : null);
+    setPreview(resolveImage(ev.cover_image));
     setError("");
     setShowModal(true);
   };
@@ -178,9 +177,7 @@ export default function ManageEvents() {
                       <td>
                         <img
                           src={
-                            ev.cover_image
-                              ? `${STATIC_URL}${ev.cover_image}`
-                              : "/placeholder.png"
+                            resolveImage(ev.cover_image) || "/placeholder.png"
                           }
                           alt=""
                           className="adm-thumb"

@@ -1,10 +1,10 @@
 export default function Loader({ fullScreen }) {
   return (
     <div
-      className="adm-loader"
-      style={fullScreen ? { minHeight: "100vh" } : undefined}
+      className="dic-loader"
+      style={fullScreen ? { minHeight: "60vh" } : undefined}
     >
-      <span className="adm-spinner" aria-hidden="true" />
+      <span className="dic-spinner" aria-hidden="true" />
       <span>Chargement...</span>
     </div>
   );

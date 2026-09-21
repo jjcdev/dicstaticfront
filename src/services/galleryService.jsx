@@ -1,4 +1,7 @@
-
-// galleryService.js
 import api from "./api";
-export const getGalleryPosts = async (params = {}) => (await api.get("/gallery", { params })).data;
+import { ensureArray } from "../utils/ensureArray";
+
+export const getGalleryPosts = async (params = {}) => {
+  const response = await api.get("/gallery", { params });
+  return ensureArray(response.data);
+};

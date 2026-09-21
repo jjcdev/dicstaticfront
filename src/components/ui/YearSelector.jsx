@@ -1,21 +1,24 @@
+import { ensureArray } from "../../utils/ensureArray";
+
 export default function YearSelector({ years, selected, onChange }) {
-  if (!years?.length) return null;
+  const list = ensureArray(years);
+  if (list.length === 0) return null;
 
   return (
-    <div className="dic-scroll-x">
-      <ul className="nav nav-pills flex-nowrap gap-2 d-inline-flex">
-        {years.map((y) => (
-          <li className="nav-item" key={y.id}>
-            <button
-              type="button"
-              className={`nav-link ${selected === y.id ? "active" : ""}`}
-              onClick={() => onChange(y.id)}
-            >
-              {y.label}
-            </button>
-          </li>
+    <div className="dic-year-selector">
+      <div className="dic-year-track">
+        {list.map((y) => (
+          <button
+            key={y.id}
+            type="button"
+            className={`dic-year-chip ${selected === y.id ? "is-active" : ""}`}
+            onClick={() => onChange(y.id)}
+          >
+            {y.label}
+            {y.is_current && <span className="dic-year-dot" />}
+          </button>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

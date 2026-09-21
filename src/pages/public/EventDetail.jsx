@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { FaArrowLeft, FaCalendarAlt, FaMapMarkerAlt } from "react-icons/fa";
 import { getEventById } from "../../services/eventService";
+import { resolveImage } from "../../utils/resolveImage";
+import Reveal from "../../components/ui/Reveal";
 import Loader from "../../components/ui/Loader";
-
-import { resolveStaticBase } from "../../services/api";
-const STATIC_URL = resolveStaticBase();
+import EmptyState from "../../components/ui/EmptyState";
 
 export default function EventDetail() {
   const { id } = useParams();
@@ -19,51 +19,84 @@ export default function EventDetail() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <Loader />;
-
-  if (!event) {
+  if (loading) {
     return (
-      <div className="container py-5">
-        <p className="text-muted">Evenement introuvable.</p>
+      <div className="dic-page">
+        <div className="container-dic">
+          <Loader />
+        </div>
       </div>
     );
   }
 
-  return (
-    <article
-      className="container py-4 py-md-5"
-      style={{ maxWidth: 900 }}
-    >
-      <Link to="/evenements" className="btn btn-sm btn-outline-secondary mb-3">
-        <FaArrowLeft className="me-2" aria-hidden="true" /> Retour
-      </Link>
-
-      {event.cover_image && (
-        <img
-          src={`${STATIC_URL}${event.cover_image}`}
-          alt={event.title}
-          className="img-fluid rounded mb-4 w-100"
-          style={{ border: "1px solid var(--dic-border)" }}
-        />
-      )}
-
-      <h1 className="h4 fw-bold mb-3">{event.title}</h1>
-
-      <div className="text-muted small mb-3 d-flex flex-wrap gap-3">
-        <span className="d-flex align-items-center gap-2">
-          <FaCalendarAlt aria-hidden="true" />
-          {new Date(event.event_date).toLocaleDateString("fr-FR")}
-        </span>
-        {event.location && (
-          <span className="d-flex align-items-center gap-2">
-            <FaMapMarkerAlt aria-hidden="true" /> {event.location}
-          </span>
-        )}
+  if (!event) {
+    return (
+      <div className="dic-page">
+        <div className="container-dic">
+          <EmptyState message="Evenement introuvable." />
+        </div>
       </div>
+    );
+  }
 
-      <p className="mb-0" style={{ whiteSpace: "pre-wrap" }}>
-        {event.description}
-      </p>
-    </article>
+  const cover = resolveImage(event.cover_image);
+
+  return (
+    <div className="dic-page">
+      <div className="container-dic">
+        <Reveal>
+          <Link
+            to="/evenements"
+            className="dic-section-link"
+            style={{ marginBottom: "1.5rem", display: "inline-flex" }}
+          >
+            <FaArrowLeft size={10} /> Retour aux evenements
+          </Link>
+        </Reveal>
+
+        <Reveal>
+          <article className="dic-event-detail">
+            {cover && (
+              <div className="dic-event-cover">
+                <img src={cover} alt={event.title} />
+              </div>
+            )}
+
+            <div className="dic-event-body">
+              <span className="dic-slide-badge">
+                {new Date(event.event_date) >= new Date() ? "A venir" : "Passe"}
+              </span>
+
+              <h1
+                className="dic-section-title"
+                style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)", marginTop: "0.85rem" }}
+              >
+                {event.title}
+              </h1>
+
+              <div className="dic-event-meta">
+                <span>
+                  <FaCalendarAlt size={12} aria-hidden="true" />
+                  {new Date(event.event_date).toLocaleDateString("fr-FR", {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </span>
+                {event.location && (
+                  <span>
+                    <FaMapMarkerAlt size={12} aria-hidden="true" />
+                    {event.location}
+                  </span>
+                )}
+              </div>
+
+              <p className="dic-event-description">{event.description}</p>
+            </div>
+          </article>
+        </Reveal>
+      </div>
+    </div>
   );
 }

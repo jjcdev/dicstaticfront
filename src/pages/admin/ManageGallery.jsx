@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
-import api, { resolveStaticBase } from "../../services/api";
+import api from "../../services/api";
+import { resolveImage } from "../../utils/resolveImage";
 import AdminPageHeader from "../../components/admin/PageHeader";
 import Modal from "../../components/ui/Modal";
 import Loader from "../../components/ui/Loader";
 import EmptyState from "../../components/ui/EmptyState";
-
-const STATIC_URL = resolveStaticBase();
 
 const CATEGORIES = [
   { value: "workshop", label: "Atelier" },
@@ -41,7 +40,7 @@ export default function ManageGallery() {
   const loadYears = () =>
     api
       .get("/academic-years")
-      .then((r) => setYears(r.data))
+      .then((r) => setYears(r.data || []))
       .catch(() => {});
 
   const loadPosts = () => {
@@ -51,7 +50,7 @@ export default function ManageGallery() {
     if (filterCategory) params.category = filterCategory;
     api
       .get("/gallery", { params })
-      .then((r) => setPosts(r.data))
+      .then((r) => setPosts(r.data || []))
       .catch(() => setPosts([]))
       .finally(() => setLoading(false));
   };
@@ -83,7 +82,7 @@ export default function ManageGallery() {
       academic_year_id: post.academic_year_id ?? "",
     });
     setImage(null);
-    setPreview(post.image_url ? `${STATIC_URL}${post.image_url}` : null);
+    setPreview(resolveImage(post.image_url));
     setError("");
     setShowModal(true);
   };
@@ -195,11 +194,7 @@ export default function ManageGallery() {
                   <tr key={p.id}>
                     <td>
                       <img
-                        src={
-                          p.image_url
-                            ? `${STATIC_URL}${p.image_url}`
-                            : "/placeholder.png"
-                        }
+                        src={resolveImage(p.image_url) || "/placeholder.png"}
                         alt=""
                         className="adm-thumb"
                       />

@@ -1,4 +1,16 @@
-// yearService.js
 import api from "./api";
-export const getAcademicYears = async () => (await api.get("/academic-years")).data;
-export const getCurrentYear   = async () => (await api.get("/academic-years/current")).data;
+import { ensureArray } from "../utils/ensureArray";
+
+export const getAcademicYears = async () => {
+  const response = await api.get("/academic-years");
+  return ensureArray(response.data);
+};
+
+export const getCurrentYear = async () => {
+  try {
+    const response = await api.get("/academic-years/current");
+    return response.data || null;
+  } catch {
+    return null;
+  }
+};

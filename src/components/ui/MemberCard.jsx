@@ -1,50 +1,59 @@
 import { FaLinkedin, FaGithub } from "react-icons/fa";
-
-import { resolveStaticBase } from "../../services/api";
-const STATIC_URL = resolveStaticBase();
+import { resolveImage } from "../../utils/resolveImage";
 
 export default function MemberCard({ member }) {
-  const photo = member.photo_url
-    ? `${STATIC_URL}${member.photo_url}`
-    : "/default-avatar.png";
+  const photo = resolveImage(member.photo_url) || "/default-avatar.png";
 
   return (
-    <article className="dic-card">
-      <img
-        src={photo}
-        alt={`${member.first_name} ${member.last_name}`}
-        className="dic-avatar"
-      />
-      <div className="dic-card-body text-center">
-        <h3 className="dic-card-title">
+    <article className="dic-slide" style={{ width: "100%" }}>
+      <div className="dic-slide-media dic-slide-media-square">
+        <img src={photo} alt={`${member.first_name} ${member.last_name}`} />
+      </div>
+      <div className="dic-slide-body">
+        <span className="dic-slide-badge">
+          {member.academic_year?.label || "Membre"}
+        </span>
+        <h3 className="dic-slide-title">
           {member.first_name} {member.last_name}
         </h3>
-        <p className="dic-card-sub">{member.role}</p>
+        <p
+          className="dic-slide-text"
+          style={{ color: "var(--color-primary)", fontWeight: 600 }}
+        >
+          {member.role}
+        </p>
         {member.bio && (
-          <p className="dic-card-text d-none d-sm-block mb-2">{member.bio}</p>
+          <p className="dic-slide-text" style={{ marginTop: "0.5rem" }}>
+            {member.bio}
+          </p>
         )}
-        <div className="d-flex justify-content-center gap-3 mt-auto pt-2">
-          {member.linkedin && (
-            <a
-              href={member.linkedin}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="LinkedIn"
-            >
-              <FaLinkedin />
-            </a>
-          )}
-          {member.github && (
-            <a
-              href={member.github}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="GitHub"
-            >
-              <FaGithub />
-            </a>
-          )}
-        </div>
+
+        {(member.linkedin || member.github) && (
+          <div className="dic-slide-tags" style={{ marginTop: "0.85rem" }}>
+            {member.linkedin && (
+              <a
+                href={member.linkedin}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="LinkedIn"
+                className="dic-member-social"
+              >
+                <FaLinkedin />
+              </a>
+            )}
+            {member.github && (
+              <a
+                href={member.github}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="GitHub"
+                className="dic-member-social"
+              >
+                <FaGithub />
+              </a>
+            )}
+          </div>
+        )}
       </div>
     </article>
   );

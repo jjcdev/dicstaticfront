@@ -15,21 +15,21 @@ export default function Modal({ title, onClose, children, footer }) {
   }, [onClose]);
 
   return (
-    <div className="adm-modal-backdrop" onClick={onClose}>
-      <div className="adm-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="adm-modal-header">
-          <h5 className="adm-modal-title">{title}</h5>
+    <div className="dic-modal-backdrop" onClick={onClose}>
+      <div className="dic-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="dic-modal-header">
+          <h5 className="dic-modal-title">{title}</h5>
           <button
-            className="adm-modal-close"
+            type="button"
+            className="dic-modal-close"
             onClick={onClose}
             aria-label="Fermer"
-            type="button"
           >
             <FaTimes />
           </button>
         </div>
-        <div className="adm-modal-body">{children}</div>
-        {footer && <div className="adm-modal-footer">{footer}</div>}
+        <div className="dic-modal-body">{children}</div>
+        {footer && <div className="dic-modal-footer">{footer}</div>}
       </div>
     </div>
   );

@@ -1,12 +1,15 @@
-export default function PageHeader({ title, subtitle }) {
+export default function PageHeader({ title, subtitle, eyebrow }) {
   return (
-    <header className="dic-page-header">
-      <h1>
-        <span className="prompt"></span>
+    <header className="dic-page-head">
+      {eyebrow && <span className="dic-eyebrow">{eyebrow}</span>}
+      <h1 className="dic-section-title" style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)" }}>
         {title}
-        <span className="cursor"></span>
       </h1>
-      {subtitle && <p>{subtitle}</p>}
+      {subtitle && (
+        <p className="dic-section-sub" style={{ marginTop: "0.5rem" }}>
+          {subtitle}
+        </p>
+      )}
     </header>
   );
 }

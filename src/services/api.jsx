@@ -1,14 +1,15 @@
 import axios from "axios";
 
-/**
- * Construit l'URL de base de l'API a partir du hostname courant.
- * - En dev local (localhost) : http://localhost:5000/api
- * - En test reseau (192.168.x.x) : http://192.168.x.x:5000/api
- * - En prod : VITE_API_URL si defini, sinon deduction.
- */
-function resolveApiBase() {
+/* ============================================================
+   Resolution dynamique des URLs
+   - En dev local       : http://localhost:5000
+   - En test reseau     : http://192.168.x.x:5000
+   - En production      : VITE_API_URL / VITE_STATIC_URL si definis
+   ============================================================ */
+
+export function resolveApiBase() {
   const explicit = import.meta.env.VITE_API_URL;
-  if (explicit && !explicit.includes("localhost")) return explicit;
+  if (explicit) return explicit;
 
   const host = window.location.hostname;
   const protocol = window.location.protocol;
@@ -17,12 +18,16 @@ function resolveApiBase() {
 
 export function resolveStaticBase() {
   const explicit = import.meta.env.VITE_STATIC_URL;
-  if (explicit && !explicit.includes("localhost")) return explicit;
+  if (explicit) return explicit;
 
   const host = window.location.hostname;
   const protocol = window.location.protocol;
   return `${protocol}//${host}:5000`;
 }
+
+/* ============================================================
+   Instance Axios
+   ============================================================ */
 
 const api = axios.create({ baseURL: resolveApiBase() });
 
