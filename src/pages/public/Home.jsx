@@ -5,11 +5,8 @@ import {
   FaFacebook,
   FaGithub,
   FaLinkedin,
-  FaBrain,
-  FaShieldAlt,
-  FaMicrochip,
-  FaCode,
   FaFlag,
+  FaShieldAlt,
   FaRobot,
   FaBolt,
   FaUsers,
@@ -26,13 +23,15 @@ import EventCard from "../../components/ui/EventCard";
 import { getEvents } from "../../services/eventService";
 import { ensureArray } from "../../utils/ensureArray";
 
-/* ============ Donnees statiques ============ */
+/* ============================================================
+   Données statiques
+   ============================================================ */
 
 const MARQUEE = [
   "Intelligence Artificielle",
-  "Cybersecurite",
+  "Cybersécurité",
   "Robotique",
-  "Systemes embarques",
+  "Systèmes embarqués",
   "Machine Learning",
   "CTF",
   "IoT",
@@ -41,36 +40,28 @@ const MARQUEE = [
 
 const POLES = [
   {
-    Icon: FaBrain,
-    badge: "Pole 01",
+    badge: "Pôle 01",
     title: "Intelligence Artificielle",
-    text: "Modelisation, entrainement et deploiement de modeles d'apprentissage. Ateliers pratiques et projets appliques.",
+    text: "Modélisation, entraînement et déploiement de modèles d'apprentissage. Ateliers pratiques et projets appliqués.",
     tags: ["ML", "Deep Learning", "NLP", "Vision"],
+    image: "/poles/ia.jpg",
     accent: false,
   },
   {
-    Icon: FaShieldAlt,
-    badge: "Pole 02",
-    title: "Cybersecurite",
-    text: "Analyse de vulnerabilites, forensique et participation a des competitions Capture The Flag.",
+    badge: "Pôle 02",
+    title: "Cybersécurité",
+    text: "Analyse de vulnérabilités, forensique et participation à des compétitions Capture The Flag.",
     tags: ["Pentest", "Forensique", "Crypto", "CTF"],
+    image: "/poles/cyber.jpg",
     accent: true,
   },
   {
-    Icon: FaMicrochip,
-    badge: "Pole 03",
-    title: "Robotique et Systemes embarques",
-    text: "Conception de systemes physiques : capteurs, actionneurs, protocoles de communication.",
+    badge: "Pôle 03",
+    title: "Robotique et Systèmes embarqués",
+    text: "Conception de systèmes physiques : capteurs, actionneurs, protocoles de communication.",
     tags: ["Arduino", "Raspberry Pi", "ROS", "IoT"],
+    image: "/poles/robotique.jpg",
     accent: false,
-  },
-  {
-    Icon: FaCode,
-    badge: "Pole 04",
-    title: "Developpement logiciel",
-    text: "Applications web, outils internes et contributions open source. Du prototype a la mise en production.",
-    tags: ["Web", "Mobile", "API", "DevOps"],
-    accent: true,
   },
 ];
 
@@ -78,48 +69,58 @@ const CHALLENGES = [
   {
     Icon: FaFlag,
     title: "Hackathons",
-    text: "48 heures pour concevoir une solution a un probleme reel.",
+    text: "48 heures pour concevoir une solution à un problème réel.",
+    image: "/challenges/hackathon.jpg",
   },
   {
     Icon: FaShieldAlt,
     title: "CTF",
-    text: "Competitions de securite par equipes, du debutant a l'avance.",
+    text: "Compétitions de sécurité par équipes, du débutant à l'avancé.",
+    image: "/challenges/ctf.jpg",
   },
   {
     Icon: FaRobot,
     title: "Concours robotique",
-    text: "Robots autonomes, suivi de ligne, bras articules.",
+    text: "Robots autonomes, suivi de ligne, bras articulés.",
+    image: "/challenges/robotique.jpg",
   },
   {
     Icon: FaBolt,
     title: "Code sprints",
-    text: "Sessions intensives sur un theme : IA, web, embarque.",
+    text: "Sessions intensives sur un thème : IA, web, embarqué.",
+    image: "/challenges/sprint.jpg",
   },
 ];
 
 const STATS = [
-  { Icon: FaUsers, to: 120, suffix: "+", label: "Membres" },
-  { Icon: FaRocket, to: 30, suffix: "+", label: "Projets" },
-  { Icon: FaTrophy, to: 12, suffix: "", label: "Challenges" },
-  { Icon: FaCalendarAlt, to: 25, suffix: "+", label: "Evenements" },
+  { Icon: FaUsers, to: 120, suffix: "+", label: "Membres", image: "/stats/membres.jpg" },
+  { Icon: FaRocket, to: 30, suffix: "+", label: "Projets", image: "/stats/projets.jpg" },
+  { Icon: FaTrophy, to: 12, suffix: "", label: "Challenges", image: "/stats/challenges.jpg" },
+  { Icon: FaCalendarAlt, to: 25, suffix: "+", label: "Événements", image: "/stats/evenements.jpg" },
 ];
 
-/* ============ Hook : taille d'ecran ============ */
+/* ============================================================
+   Hook : media query
+   ============================================================ */
 
 function useMediaQuery(query) {
   const [matches, setMatches] = useState(() =>
     typeof window !== "undefined" ? window.matchMedia(query).matches : false
   );
+
   useEffect(() => {
     const mq = window.matchMedia(query);
     const onChange = (e) => setMatches(e.matches);
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
   }, [query]);
+
   return matches;
 }
 
-/* ============ Composant Counter ============ */
+/* ============================================================
+   Compteur animé
+   ============================================================ */
 
 function Counter({ to, suffix = "" }) {
   const ref = useRef(null);
@@ -165,7 +166,9 @@ function Counter({ to, suffix = "" }) {
   );
 }
 
-/* ============ Composant : titre qui apparait mot par mot ============ */
+/* ============================================================
+   Titre animé
+   ============================================================ */
 
 function AnimatedTitle({ children, delay = 0 }) {
   return (
@@ -175,26 +178,31 @@ function AnimatedTitle({ children, delay = 0 }) {
   );
 }
 
-/* ============ Page ============ */
+/* ============================================================
+   Page
+   ============================================================ */
 
 export default function Home() {
   const [events, setEvents] = useState([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
   const isDesktop = useMediaQuery("(min-width: 992px)");
 
   useEffect(() => {
+    setEventsLoading(true);
     getEvents({ limit: 8 })
       .then((data) => setEvents(ensureArray(data)))
-      .catch(() => setEvents([]));
+      .catch(() => setEvents([]))
+      .finally(() => setEventsLoading(false));
   }, []);
 
   return (
     <div className="home">
-      {/* Blobs decoratifs flottants */}
+      {/* Blobs décoratifs */}
       <div className="home-blob home-blob-top" aria-hidden="true" />
       <div className="home-blob home-blob-bottom" aria-hidden="true" />
 
       <div className="home-content">
-        {/* ============== HERO FULLSCREEN ============== */}
+        {/* ============== HERO ============== */}
         <section className="hero-full">
           <ParticleField
             variant={isDesktop ? "dense" : "default"}
@@ -222,26 +230,25 @@ export default function Home() {
                   <AnimatedTitle delay={0}>Nous construisons</AnimatedTitle>
                   <br />
                   <AnimatedTitle delay={180}>
-                    <span className="accent">le futur numerique.</span>
+                    <span className="accent">le futur numérique.</span>
                   </AnimatedTitle>
                 </h1>
                 <p className="hero-sub">
-                  Digital Innovation Club rassemble les etudiants
-                  passionnes autour de trois poles : IA, cybersecurité et
-                  robotique. Challenges,
-                  ateliers, projets reels.
+                  Digital Innovation Club rassemble les étudiants passionnés
+                  autour de trois pôles : IA, cybersécurité et robotique.
+                  Challenges, ateliers, projets réels.
                 </p>
                 <div className="hero-actions">
                   <Link to="/a-propos" className="dic-btn dic-btn-primary">
                     Rejoindre le club <FaArrowRight size={12} />
                   </Link>
                   <Link to="/evenements" className="dic-btn dic-btn-ghost">
-                    Voir les evenements
+                    Voir les événements
                   </Link>
                 </div>
               </div>
 
-              <aside className="hero-social" aria-label="Reseaux sociaux">
+              <aside className="hero-social" aria-label="Réseaux sociaux">
                 <a href="#" aria-label="LinkedIn"><FaLinkedin /></a>
                 <a href="#" aria-label="Facebook"><FaFacebook /></a>
                 <a href="#" aria-label="GitHub"><FaGithub /></a>
@@ -256,16 +263,12 @@ export default function Home() {
             </div>
           </div>
 
-          <a
-            href="#poles"
-            className="hero-scroll"
-            aria-label="Faire defiler"
-          >
+          <a href="#poles" className="hero-scroll" aria-label="Faire défiler">
             <FaChevronDown />
           </a>
         </section>
 
-        {/* ============== MARQUEE AVEC FOND ANIME ============== */}
+        {/* ============== MARQUEE ============== */}
         <div className="dic-marquee-wrap">
           <ParticleField variant="ambient" interactive={false} />
           <div className="dic-marquee" aria-hidden="true">
@@ -280,20 +283,20 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ============== POLES ============== */}
+        {/* ============== PÔLES ============== */}
         <section id="poles" className="dic-section">
           <div className="container-dic">
             <Reveal>
               <div className="dic-section-head">
                 <div>
-                  <span className="dic-eyebrow">Nos poles</span>
+                  <span className="dic-eyebrow">Nos pôles</span>
                   <h2 className="dic-section-title">
-                    Quatre terrains d'exploration.
+                    Trois terrains d'exploration.
                   </h2>
                   <p className="dic-section-sub">
-                    Chaque pole mene ses propres projets, ateliers et
+                    Chaque pôle mène ses propres projets, ateliers et
                     challenges. Rejoins celui qui te parle, ou explore les
-                    quatre.
+                    trois.
                   </p>
                 </div>
                 <Link to="/a-propos" className="dic-section-link">
@@ -303,7 +306,7 @@ export default function Home() {
             </Reveal>
 
             <Reveal>
-              <Slider ariaLabel="Poles du club">
+              <Slider ariaLabel="Pôles du club">
                 {POLES.map((p, i) => (
                   <article
                     className="dic-slide dic-slide-anim"
@@ -311,9 +314,9 @@ export default function Home() {
                     key={p.title}
                     style={{ animationDelay: `${i * 80}ms` }}
                   >
-                    <div className="dic-slide-media">
+                    <div className="dic-slide-media dic-slide-media-pole">
+                      <img src={p.image} alt={p.title} loading="lazy" />
                       <div className="dic-slide-glow" aria-hidden="true" />
-                      <p.Icon className="dic-slide-icon" aria-hidden="true" />
                     </div>
                     <div className="dic-slide-body">
                       <span
@@ -324,7 +327,9 @@ export default function Home() {
                       <h3 className="dic-slide-title">{p.title}</h3>
                       <p className="dic-slide-text">{p.text}</p>
                       <div className="dic-slide-tags">
-                        {p.tags.map((t) => <span key={t}>{t}</span>)}
+                        {p.tags.map((t) => (
+                          <span key={t}>{t}</span>
+                        ))}
                       </div>
                     </div>
                   </article>
@@ -335,7 +340,7 @@ export default function Home() {
         </section>
 
         {/* ============== CHALLENGES ============== */}
-        <section className="dic-section">
+        <section className="dic-section dic-section-soft">
           <div className="container-dic">
             <Reveal>
               <div className="dic-section-head">
@@ -345,8 +350,8 @@ export default function Home() {
                     On organise, on participe, on gagne.
                   </h2>
                   <p className="dic-section-sub">
-                    Toute l'annee, le club met en place des competitions
-                    internes et represente l'ecole a l'exterieur.
+                    Toute l'année, le club met en place des compétitions
+                    internes et représente l'école à l'extérieur.
                   </p>
                 </div>
               </div>
@@ -355,29 +360,34 @@ export default function Home() {
             <div className="dic-challenges-grid">
               {CHALLENGES.map((c, i) => (
                 <Reveal key={c.title} delay={i * 80}>
-                  <div className="dic-challenge dic-hover-lift">
-                    <div className="dic-challenge-icon">
-                      <c.Icon aria-hidden="true" />
+                  <article className="dic-challenge dic-challenge-img dic-hover-lift">
+                    <div className="dic-challenge-media">
+                      <img src={c.image} alt={c.title} loading="lazy" />
                     </div>
-                    <h3 className="dic-challenge-title">{c.title}</h3>
-                    <p className="dic-challenge-text">{c.text}</p>
-                  </div>
+                    <div className="dic-challenge-body">
+                      <div className="dic-challenge-icon">
+                        <c.Icon aria-hidden="true" />
+                      </div>
+                      <h3 className="dic-challenge-title">{c.title}</h3>
+                      <p className="dic-challenge-text">{c.text}</p>
+                    </div>
+                  </article>
                 </Reveal>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ============== STATS AVEC FOND ANIME ============== */}
+        {/* ============== STATS ============== */}
         <section className="dic-section dic-section-particles">
           <ParticleField variant="sparse" interactive={false} />
-          <div className="container-dic" style={{ position: "relative", zIndex: 1 }}>
+          <div className="container-dic dic-section-inner">
             <Reveal>
               <div className="dic-section-head">
                 <div>
                   <span className="dic-eyebrow">En chiffres</span>
                   <h2 className="dic-section-title">
-                    Ce que le club represente aujourd'hui.
+                    Ce que le club représente aujourd'hui.
                   </h2>
                 </div>
               </div>
@@ -386,41 +396,65 @@ export default function Home() {
             <div className="dic-stats">
               {STATS.map((s, i) => (
                 <Reveal key={s.label} delay={i * 80}>
-                  <div className="dic-stat dic-hover-lift">
-                    <div className="dic-stat-icon-wrap">
-                      <s.Icon aria-hidden="true" />
+                  <article className="dic-stat dic-stat-img dic-hover-lift">
+                    <div className="dic-stat-media">
+                      <img src={s.image} alt="" loading="lazy" />
                     </div>
-                    <div className="dic-stat-value">
-                      <Counter to={s.to} suffix={s.suffix} />
+                    <div className="dic-stat-body">
+                      <div className="dic-stat-icon-wrap">
+                        <s.Icon aria-hidden="true" />
+                      </div>
+                      <div className="dic-stat-value">
+                        <Counter to={s.to} suffix={s.suffix} />
+                      </div>
+                      <div className="dic-stat-label">{s.label}</div>
                     </div>
-                    <div className="dic-stat-label">{s.label}</div>
-                  </div>
+                  </article>
                 </Reveal>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ============== EVENTS SLIDER ============== */}
-        {Array.isArray(events) && events.length > 0 && (
-          <section className="dic-section">
-            <div className="container-dic">
-              <Reveal>
-                <div className="dic-section-head">
-                  <div>
-                    <span className="dic-eyebrow">Agenda</span>
-                    <h2 className="dic-section-title">
-                      Ce qui arrive bientot.
-                    </h2>
-                  </div>
-                  <Link to="/evenements" className="dic-section-link">
-                    Tout voir <FaArrowRight size={10} />
-                  </Link>
+        {/* ============== ÉVÉNEMENTS ============== */}
+        <section className="dic-section">
+          <div className="container-dic">
+            <Reveal>
+              <div className="dic-section-head">
+                <div>
+                  <span className="dic-eyebrow">Agenda</span>
+                  <h2 className="dic-section-title">
+                    Ce qui arrive bientôt.
+                  </h2>
+                  <p className="dic-section-sub">
+                    Ateliers, hackathons et rendez-vous du club.
+                  </p>
                 </div>
-              </Reveal>
+                <Link to="/evenements" className="dic-section-link">
+                  Tout voir <FaArrowRight size={10} />
+                </Link>
+              </div>
+            </Reveal>
 
+            {eventsLoading ? (
+              <div className="dic-home-events-empty">
+                Chargement des événements...
+              </div>
+            ) : events.length === 0 ? (
+              <div className="dic-home-events-empty">
+                Aucun événement à venir pour le moment.
+                <br />
+                <Link
+                  to="/evenements"
+                  className="dic-section-link"
+                  style={{ marginTop: "0.75rem" }}
+                >
+                  Voir tous les événements <FaArrowRight size={10} />
+                </Link>
+              </div>
+            ) : (
               <Reveal>
-                <Slider ariaLabel="Evenements a venir">
+                <Slider ariaLabel="Événements à venir">
                   {events.map((e) => (
                     <div className="dic-slide" data-slide key={e.id}>
                       <EventCard event={e} />
@@ -428,23 +462,28 @@ export default function Home() {
                   ))}
                 </Slider>
               </Reveal>
-            </div>
-          </section>
-        )}
+            )}
+          </div>
+        </section>
 
-        {/* ============== CTA FINAL AVEC FOND ANIME ============== */}
+        {/* ============== CTA ============== */}
         <section className="dic-section">
           <div className="container-dic">
             <Reveal>
               <div className="dic-cta">
+                <div
+                  className="dic-cta-bg"
+                  style={{ backgroundImage: "url('/cta-bg.jpg')" }}
+                  aria-hidden="true"
+                />
                 <ParticleField variant="sparse" interactive={false} />
                 <div className="dic-cta-content">
-                  <div>
+                  <div className="dic-cta-text">
                     <h2 className="dic-cta-title">
-                      Pret a construire avec nous ?
+                      Prêt à construire avec nous ?
                     </h2>
                     <p className="dic-cta-sub">
-                      Rejoins le club, choisis ton pole, participe aux
+                      Rejoins le club, choisis ton pôle, participe aux
                       challenges et fais partie de l'aventure.
                     </p>
                   </div>
