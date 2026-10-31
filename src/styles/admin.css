@@ -1557,3 +1557,137 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ============================================================
+   CANDIDATURES — detail
+   ============================================================ */
+
+.adm-application-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.adm-application-head {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--adm-border);
+}
+
+.adm-application-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--adm-radius-sm);
+  background: var(--adm-primary-soft);
+  color: var(--adm-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.adm-application-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--adm-text);
+}
+
+.adm-application-meta {
+  font-size: 12.5px;
+  color: var(--adm-text-muted);
+}
+
+.adm-application-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+}
+
+@media (min-width: 576px) {
+  .adm-application-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.adm-application-grid a {
+  color: var(--adm-primary);
+  text-decoration: none;
+  font-size: 13.5px;
+}
+
+.adm-application-grid a:hover {
+  text-decoration: underline;
+}
+
+.adm-application-grid .adm-label {
+  margin-bottom: 0.15rem;
+}
+
+.adm-application-motivations {
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--adm-text);
+  white-space: pre-wrap;
+  padding: 0.85rem 1rem;
+  background: var(--adm-surface-2);
+  border-radius: var(--adm-radius-sm);
+}
+
+/* ============================================================
+   REGLEMENT — ordre
+   ============================================================ */
+
+.adm-order-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.adm-order-value {
+  font-family: var(--adm-font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--adm-text-muted);
+  min-width: 20px;
+  text-align: center;
+}
+
+.adm-order-controls .adm-icon-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.adm-order-controls .adm-icon-btn:disabled:hover {
+  color: var(--adm-text-muted);
+  border-color: var(--adm-border);
+  background: transparent;
+  transform: none;
+}
+
+/* ============================================================
+   TOOLBAR — icone dans label
+   ============================================================ */
+
+.adm-toolbar .adm-label svg {
+  margin-right: 0.35rem;
+  vertical-align: -2px;
+  color: var(--adm-text-dim);
+}
+
+/* ============================================================
+   RESPONSIVE ADMIN
+   ============================================================ */
+
+@media (max-width: 767.98px) {
+  .adm-order-controls {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .adm-application-grid {
+    grid-template-columns: 1fr;
+  }
+}

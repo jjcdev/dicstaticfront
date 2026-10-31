@@ -3,18 +3,47 @@ import { Outlet, useLocation } from "react-router-dom";
 import AdminSidebar from "./AdminSidebar";
 
 const TITLES = {
-  "/admin/dashboard": { title: "Tableau de bord", subtitle: "Vue d'ensemble du club" },
-  "/admin/annees": { title: "Annees academiques", subtitle: "Gerez les periodes du club" },
-  "/admin/membres": { title: "Membres", subtitle: "Administration par annee" },
-  "/admin/galerie": { title: "Galerie", subtitle: "Photos publiees sur le site" },
-  "/admin/evenements": { title: "Evenements", subtitle: "Evenements du club" },
-  "/admin/messages": { title: "Messages", subtitle: "Boite de reception" },
+  "/admin/dashboard": {
+    title: "Tableau de bord",
+    subtitle: "Vue d'ensemble du club",
+  },
+  "/admin/annees": {
+    title: "Annees academiques",
+    subtitle: "Gerez les periodes du club",
+  },
+  "/admin/membres": {
+    title: "Membres",
+    subtitle: "Administration par annee",
+  },
+  "/admin/galerie": {
+    title: "Galerie",
+    subtitle: "Photos publiees sur le site",
+  },
+  "/admin/evenements": {
+    title: "Evenements",
+    subtitle: "Evenements du club",
+  },
+  "/admin/candidatures": {
+    title: "Candidatures",
+    subtitle: "Recrutement du club",
+  },
+  "/admin/reglement": {
+    title: "Reglement",
+    subtitle: "Sections du reglement interieur",
+  },
+  "/admin/messages": {
+    title: "Messages",
+    subtitle: "Boite de reception",
+  },
 };
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
-  const page = TITLES[location.pathname] || { title: "Administration", subtitle: "" };
+  const page = TITLES[location.pathname] || {
+    title: "Administration",
+    subtitle: "",
+  };
 
   return (
     <div className="adm-shell">

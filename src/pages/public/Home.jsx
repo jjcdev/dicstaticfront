@@ -2,8 +2,6 @@ import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
   FaArrowRight,
-  FaFacebook,
-  FaGithub,
   FaLinkedin,
   FaFlag,
   FaShieldAlt,
@@ -18,8 +16,9 @@ import {
 
 import Reveal from "../../components/ui/Reveal";
 import Slider from "../../components/ui/Slider";
-import ParticleField from "../../components/ui/ParticleField";
 import EventCard from "../../components/ui/EventCard";
+import TechBackground from "../../components/ui/TechBackground";
+import HeroBackdrop from "../../components/ui/HeroBackdrop";
 import { getEvents } from "../../services/eventService";
 import { ensureArray } from "../../utils/ensureArray";
 
@@ -99,27 +98,11 @@ const STATS = [
   { Icon: FaCalendarAlt, to: 25, suffix: "+", label: "Événements", image: "/stats/evenements.jpg" },
 ];
 
-/* ============================================================
-   Hook : media query
-   ============================================================ */
-
-function useMediaQuery(query) {
-  const [matches, setMatches] = useState(() =>
-    typeof window !== "undefined" ? window.matchMedia(query).matches : false
-  );
-
-  useEffect(() => {
-    const mq = window.matchMedia(query);
-    const onChange = (e) => setMatches(e.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, [query]);
-
-  return matches;
-}
+const LINKEDIN_URL =
+  "https://www.linkedin.com/company/digital-innovation-club";
 
 /* ============================================================
-   Compteur animé
+   Compteur (uniquement pour la section stats)
    ============================================================ */
 
 function Counter({ to, suffix = "" }) {
@@ -167,25 +150,12 @@ function Counter({ to, suffix = "" }) {
 }
 
 /* ============================================================
-   Titre animé
-   ============================================================ */
-
-function AnimatedTitle({ children, delay = 0 }) {
-  return (
-    <span className="anim-title" style={{ animationDelay: `${delay}ms` }}>
-      {children}
-    </span>
-  );
-}
-
-/* ============================================================
    Page
    ============================================================ */
 
 export default function Home() {
   const [events, setEvents] = useState([]);
   const [eventsLoading, setEventsLoading] = useState(true);
-  const isDesktop = useMediaQuery("(min-width: 992px)");
 
   useEffect(() => {
     setEventsLoading(true);
@@ -196,42 +166,51 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="home">
-      {/* Blobs décoratifs */}
-      <div className="home-blob home-blob-top" aria-hidden="true" />
-      <div className="home-blob home-blob-bottom" aria-hidden="true" />
-
+    <div className="">
       <div className="home-content">
         {/* ============== HERO ============== */}
         <section className="hero-full">
-          <ParticleField
-            variant={isDesktop ? "dense" : "default"}
-            interactive={isDesktop}
-          />
-          <div className="hero-dotgrid" aria-hidden="true" />
-          <div className="hero-glow" aria-hidden="true" />
+          <div className="hero-image" aria-hidden="true" />
+         
+          {/* <HeroBackdrop /> */}
+          <div className="hero-overlay" aria-hidden="true" />
+          <div className="hero-grain" aria-hidden="true" />
 
-          <div className="container-dic hero-full-inner">
+          <div className="container-dic hero-inner">
             <div className="hero-top">
               <span className="hero-brand">
+                <div className="d-block">
+                <div className="text-center">
                 <span className="hero-brand-dot" />
-                DIGITAL INNOVATION CLUB
+                <h2 className="fw-bold text-white">DIGITAL INNOVATION CLUB</h2>
+                </div>
+                <div className="mt-3 text-center">
+                  <h6 className="text-white">Learn . Build . Innovate</h6>
+                </div>
+                </div>
               </span>
               <ul className="hero-links">
-                <li><Link to="/a-propos">Notre histoire</Link></li>
-                <li><Link to="/bureau">Bureau</Link></li>
-                <li><Link to="/evenements">Agenda</Link></li>
+                <li>
+                  <Link to="/a-propos">A propos</Link>
+                </li>
+                <li>
+                  <Link to="/bureau">Bureau</Link>
+                </li>
+                <li>
+                  <Link to="/evenements">Agenda</Link>
+                </li>
+                <li>
+                  <Link to="/reglement">Règlement</Link>
+                </li>
               </ul>
             </div>
 
             <div className="hero-main">
               <div className="hero-copy">
                 <h1 className="hero-title">
-                  <AnimatedTitle delay={0}>Nous construisons</AnimatedTitle>
+                  Nous construisons
                   <br />
-                  <AnimatedTitle delay={180}>
-                    <span className="accent">le futur numérique.</span>
-                  </AnimatedTitle>
+                  <span className="accent">le futur numérique.</span>
                 </h1>
                 <p className="hero-sub">
                   Digital Innovation Club rassemble les étudiants passionnés
@@ -239,7 +218,10 @@ export default function Home() {
                   Challenges, ateliers, projets réels.
                 </p>
                 <div className="hero-actions">
-                  <Link to="/a-propos" className="dic-btn dic-btn-primary">
+                  <Link
+                    to="/recrutement"
+                    className="dic-btn dic-btn-primary"
+                  >
                     Rejoindre le club <FaArrowRight size={12} />
                   </Link>
                   <Link to="/evenements" className="dic-btn dic-btn-ghost">
@@ -248,18 +230,17 @@ export default function Home() {
                 </div>
               </div>
 
-              <aside className="hero-social" aria-label="Réseaux sociaux">
-                <a href="#" aria-label="LinkedIn"><FaLinkedin /></a>
-                <a href="#" aria-label="Facebook"><FaFacebook /></a>
-                <a href="#" aria-label="GitHub"><FaGithub /></a>
+              <aside className="hero-social" aria-label="LinkedIn">
+                <a
+                  href={LINKEDIN_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn"
+                  title="LinkedIn"
+                >
+                  <FaLinkedin />
+                </a>
               </aside>
-            </div>
-
-            <div className="hero-dots">
-              <span className="is-active" />
-              <span />
-              <span />
-              <span />
             </div>
           </div>
 
@@ -270,7 +251,7 @@ export default function Home() {
 
         {/* ============== MARQUEE ============== */}
         <div className="dic-marquee-wrap">
-          <ParticleField variant="ambient" interactive={false} />
+          <TechBackground variant="circuit" />
           <div className="dic-marquee" aria-hidden="true">
             <div className="dic-marquee-track">
               {[...MARQUEE, ...MARQUEE].map((word, i) => (
@@ -307,12 +288,11 @@ export default function Home() {
 
             <Reveal>
               <Slider ariaLabel="Pôles du club">
-                {POLES.map((p, i) => (
+                {POLES.map((p) => (
                   <article
                     className="dic-slide dic-slide-anim"
                     data-slide
                     key={p.title}
-                    style={{ animationDelay: `${i * 80}ms` }}
                   >
                     <div className="dic-slide-media dic-slide-media-pole">
                       <img src={p.image} alt={p.title} loading="lazy" />
@@ -380,7 +360,7 @@ export default function Home() {
 
         {/* ============== STATS ============== */}
         <section className="dic-section dic-section-particles">
-          <ParticleField variant="sparse" interactive={false} />
+          <TechBackground variant="grid" />
           <div className="container-dic dic-section-inner">
             <Reveal>
               <div className="dic-section-head">
@@ -438,7 +418,7 @@ export default function Home() {
 
             {eventsLoading ? (
               <div className="dic-home-events-empty">
-                Chargement des événements...
+                Chargement des événements…
               </div>
             ) : events.length === 0 ? (
               <div className="dic-home-events-empty">
@@ -476,7 +456,6 @@ export default function Home() {
                   style={{ backgroundImage: "url('/cta-bg.jpg')" }}
                   aria-hidden="true"
                 />
-                <ParticleField variant="sparse" interactive={false} />
                 <div className="dic-cta-content">
                   <div className="dic-cta-text">
                     <h2 className="dic-cta-title">
@@ -487,7 +466,7 @@ export default function Home() {
                       challenges et fais partie de l'aventure.
                     </p>
                   </div>
-                  <Link to="/contact" className="dic-btn dic-btn-primary">
+                  <Link to="/recrutement" className="dic-btn dic-btn-primary">
                     Rejoindre le club <FaArrowRight size={12} />
                   </Link>
                 </div>

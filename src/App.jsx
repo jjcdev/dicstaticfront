@@ -10,6 +10,8 @@ import Gallery from "./pages/public/Gallery";
 import Events from "./pages/public/Events";
 import EventDetail from "./pages/public/EventDetail";
 import Contact from "./pages/public/Contact";
+import Recruitment from "./pages/public/Recruitment";
+import Rules from "./pages/public/Rules";
 import NotFound from "./pages/public/NotFound";
 
 import Login from "./pages/admin/Login";
@@ -18,6 +20,8 @@ import ManageYears from "./pages/admin/ManageYears";
 import ManageMembers from "./pages/admin/ManageMembers";
 import ManageGallery from "./pages/admin/ManageGallery";
 import ManageEvents from "./pages/admin/ManageEvents";
+import ManageApplications from "./pages/admin/ManageApplications";
+import ManageRules from "./pages/admin/ManageRules";
 import Messages from "./pages/admin/Messages";
 
 export default function App() {
@@ -31,6 +35,8 @@ export default function App() {
         <Route path="/evenements" element={<Events />} />
         <Route path="/evenements/:id" element={<EventDetail />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/recrutement" element={<Recruitment />} />
+        <Route path="/reglement" element={<Rules />} />
         <Route path="*" element={<NotFound />} />
       </Route>
 
@@ -50,6 +56,8 @@ export default function App() {
         <Route path="membres" element={<ManageMembers />} />
         <Route path="galerie" element={<ManageGallery />} />
         <Route path="evenements" element={<ManageEvents />} />
+        <Route path="candidatures" element={<ManageApplications />} />
+        <Route path="reglement" element={<ManageRules />} />
         <Route path="messages" element={<Messages />} />
       </Route>
     </Routes>

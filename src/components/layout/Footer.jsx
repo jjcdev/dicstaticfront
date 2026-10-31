@@ -1,18 +1,19 @@
 import { Link } from "react-router-dom";
 import {
-  FaFacebook,
-  FaGithub,
   FaLinkedin,
   FaEnvelope,
   FaMapMarkerAlt,
 } from "react-icons/fa";
 
-const columns = [
+const LINKEDIN_URL =
+  "https://www.linkedin.com/company/digital-innovation-club";
+
+const COLUMNS = [
   {
     title: "Navigation",
     items: [
       { to: "/", label: "Accueil" },
-      { to: "/a-propos", label: "A propos" },
+      { to: "/a-propos", label: "À propos" },
       { to: "/bureau", label: "Bureau" },
     ],
   },
@@ -20,7 +21,14 @@ const columns = [
     title: "Explorer",
     items: [
       { to: "/galerie", label: "Galerie" },
-      { to: "/evenements", label: "Evenements" },
+      { to: "/evenements", label: "Événements" },
+      { to: "/reglement", label: "Règlement" },
+    ],
+  },
+  {
+    title: "Rejoindre",
+    items: [
+      { to: "/recrutement", label: "Candidater" },
       { to: "/contact", label: "Contact" },
     ],
   },
@@ -39,18 +47,24 @@ export default function Footer() {
               <span>Digital Innovation Club</span>
             </Link>
             <p className="dic-footer-text">
-              Un club ou l'on construit, apprend et partage autour de
-              l'intelligence artificielle, de la cybersecurite et des
-              systemes embarques.
+              Un club où l'on construit, apprend et partage autour de
+              l'intelligence artificielle, de la cybersécurité et des
+              systèmes embarqués.
             </p>
             <div className="dic-footer-socials">
-              <a href="#" aria-label="Facebook"><FaFacebook /></a>
-              <a href="#" aria-label="GitHub"><FaGithub /></a>
-              <a href="#" aria-label="LinkedIn"><FaLinkedin /></a>
+              <a
+                href={LINKEDIN_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                title="LinkedIn"
+              >
+                <FaLinkedin />
+              </a>
             </div>
           </div>
 
-          {columns.map((col) => (
+          {COLUMNS.map((col) => (
             <div key={col.title}>
               <h6 className="dic-footer-title">{col.title}</h6>
               <ul className="dic-footer-list">
@@ -77,8 +91,10 @@ export default function Footer() {
         </div>
 
         <div className="dic-footer-bottom">
-          <span>{year} <span className="accent">///</span> Digital Innovation Club</span>
-          <span>Tous droits reserves</span>
+          <span>
+            {year} <span className="accent">///</span> Digital Innovation Club
+          </span>
+          <span>Tous droits réservés</span>
         </div>
       </div>
     </footer>

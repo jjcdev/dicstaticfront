@@ -6,6 +6,8 @@ import {
   FaUsers,
   FaImages,
   FaCalendarCheck,
+  FaUserPlus,
+  FaBook,
   FaEnvelope,
   FaSignOutAlt,
 } from "react-icons/fa";
@@ -19,6 +21,13 @@ const links = [
   { to: "/admin/galerie", label: "Galerie", Icon: FaImages },
   { to: "/admin/evenements", label: "Evenements", Icon: FaCalendarCheck },
   {
+    to: "/admin/candidatures",
+    label: "Candidatures",
+    Icon: FaUserPlus,
+    badgeKey: "applications",
+  },
+  { to: "/admin/reglement", label: "Reglement", Icon: FaBook },
+  {
     to: "/admin/messages",
     label: "Messages",
     Icon: FaEnvelope,
@@ -29,7 +38,7 @@ const links = [
 export default function AdminSidebar({ open, onClose }) {
   const { admin, signOut } = useAuth();
   const navigate = useNavigate();
-  const [stats, setStats] = useState({ unread: 0 });
+  const [stats, setStats] = useState({ unread: 0, applications: 0 });
 
   useEffect(() => {
     api
@@ -56,7 +65,11 @@ export default function AdminSidebar({ open, onClose }) {
       />
 
       <aside className={`adm-sidebar ${open ? "is-open" : ""}`}>
-        <Link to="/admin/dashboard" className="adm-sidebar-brand" onClick={onClose}>
+        <Link
+          to="/admin/dashboard"
+          className="adm-sidebar-brand"
+          onClick={onClose}
+        >
           <img src="/logo-dic.png" alt="DIC" />
           <div className="adm-sidebar-brand-text">
             <strong>DIC Admin</strong>
