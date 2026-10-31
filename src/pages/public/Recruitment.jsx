@@ -30,7 +30,7 @@ const INITIAL_FORM = {
   first_name: "",
   last_name: "",
   email: "",
-  phone_prefix: "",
+  phone_prefix: DEFAULT_PHONE_PREFIX,
   phone_number: "",
   school: "",
   field_of_study: "",
@@ -38,7 +38,7 @@ const INITIAL_FORM = {
   motivations: "",
   source: "",
 };
-
+const DEFAULT_PHONE_PREFIX = "+229";
 export default function Recruitment() {
   const [prefixes, setPrefixes] = useState([]);
   const [prefixesLoading, setPrefixesLoading] = useState(true);
@@ -47,22 +47,31 @@ export default function Recruitment() {
   const [errorMessage, setErrorMessage] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
 
-  /* Chargement des préfixes téléphoniques */
   useEffect(() => {
-    setPrefixesLoading(true);
-    getPhonePrefixes()
-      .then((list) => {
-        const sorted = [...list].sort((a, b) =>
-          a.label.localeCompare(b.label, "fr")
+  setPrefixesLoading(true);
+  getPhonePrefixes()
+    .then((list) => {
+      const sorted = [...list].sort((a, b) =>
+        a.label.localeCompare(b.label, "fr")
+      );
+      setPrefixes(sorted);
+
+      /* Conserve +229 si présent dans la liste, sinon retombe sur le premier */
+      setForm((f) => {
+        const stillValid = sorted.some(
+          (p) => p.value === f.phone_prefix
         );
-        setPrefixes(sorted);
-        if (sorted.length > 0) {
-          setForm((f) => ({ ...f, phone_prefix: sorted[0].value }));
-        }
-      })
-      .catch(() => setPrefixes([]))
-      .finally(() => setPrefixesLoading(false));
-  }, []);
+        if (stillValid) return f;
+        const fallback =
+          sorted.find((p) => p.value === DEFAULT_PHONE_PREFIX)?.value ||
+          sorted[0]?.value ||
+          "";
+        return { ...f, phone_prefix: fallback };
+      });
+    })
+    .catch(() => setPrefixes([]))
+    .finally(() => setPrefixesLoading(false));
+}, []);
 
   const selectedPrefix = useMemo(
     () => prefixes.find((p) => p.value === form.phone_prefix) || null,
@@ -90,7 +99,7 @@ export default function Recruitment() {
     try {
       await submitApplication(form);
       setStatus("success");
-      setForm({ ...INITIAL_FORM, phone_prefix: form.phone_prefix });
+      setForm({ ...INITIAL_FORM});
     } catch (err) {
       const httpStatus = err.response?.status;
       const data = err.response?.data || {};
