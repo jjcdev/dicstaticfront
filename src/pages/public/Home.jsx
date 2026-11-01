@@ -99,7 +99,7 @@ const STATS = [
 ];
 
 const LINKEDIN_URL =
-  "https://www.linkedin.com/company/digital-innovation-club";
+  "https://www.linkedin.com/company/dic-insti/";
 
 /* ============================================================
    Compteur (uniquement pour la section stats)

@@ -6,7 +6,7 @@ import {
 } from "react-icons/fa";
 
 const LINKEDIN_URL =
-  "https://www.linkedin.com/company/digital-innovation-club";
+  "https://www.linkedin.com/company/dic-insti/";
 
 const COLUMNS = [
   {

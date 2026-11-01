@@ -109,3 +109,103 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+
+/* ============================================================
+   UNIFORMISATION DES CARDS DANS LES GRILLES
+   - Chaque rangée s'aligne sur la card la plus haute
+   - Le contenu interne pousse correctement (socials en bas)
+   - Responsive : 1 / 2 / 3 / 4 colonnes
+   ============================================================ */
+
+/* ---------- Chaîne : grille → Reveal → card ---------- */
+
+.dic-gallery-grid,
+.dic-members-grid,
+.dic-about-grid,
+.dic-challenges-grid {
+  align-items: stretch;
+}
+
+.dic-gallery-grid > .dic-reveal,
+.dic-members-grid > .dic-reveal,
+.dic-about-grid > .dic-reveal,
+.dic-challenges-grid > .dic-reveal {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.dic-gallery-grid > .dic-reveal > *,
+.dic-members-grid > .dic-reveal > *,
+.dic-about-grid > .dic-reveal > *,
+.dic-challenges-grid > .dic-reveal > * {
+  flex: 1;
+  min-height: 0;
+}
+
+/* ---------- Card (.dic-slide) : Gallery + Bureau ---------- */
+
+.dic-gallery-grid .dic-slide,
+.dic-members-grid .dic-slide {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Image : hauteur stable, ne se compresse pas */
+.dic-gallery-grid .dic-slide-media,
+.dic-members-grid .dic-slide-media {
+  flex-shrink: 0;
+}
+
+/* Corps : prend tout l'espace restant */
+.dic-gallery-grid .dic-slide-body,
+.dic-members-grid .dic-slide-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Bureau : les liens sociaux (ou la bio si absente) restent en bas */
+.dic-members-grid .dic-slide-body > .dic-slide-tags {
+  margin-top: auto;
+}
+
+/* ---------- Cards About : mission / vision ---------- */
+
+.dic-about-grid .dic-about-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.dic-about-grid .dic-about-card > .dic-challenge-text {
+  flex: 1;
+}
+
+/* ---------- Cards valeurs About (.dic-challenge sans image) ---------- */
+
+.dic-challenges-grid .dic-challenge {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.dic-challenges-grid .dic-challenge > .dic-challenge-text {
+  flex: 1;
+}
+
+/* Cards challenges avec image (Home) : déjà flex, on sécurise */
+.dic-challenges-grid .dic-challenge-img .dic-challenge-media {
+  flex-shrink: 0;
+}
+
+.dic-challenges-grid .dic-challenge-img .dic-challenge-body {
+  flex: 1;
+}
+
+.dic-challenges-grid .dic-challenge-img .dic-challenge-text {
+  flex: 1;
+}

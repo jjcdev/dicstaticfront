@@ -13,7 +13,7 @@ const LINKS = [
 ];
 
 const LINKEDIN_URL =
-  "https://www.linkedin.com/company/digital-innovation-club";
+  "https://www.linkedin.com/company/dic-insti/";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
